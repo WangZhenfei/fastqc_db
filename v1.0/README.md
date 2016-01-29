@@ -19,12 +19,21 @@ at $FASTQC_DB_NAME or (by default) ./fastqc.db.
 
     sqlite3 fastqc.db
     # SELECT * FROM basic;
-    # SELECT basic.filename, module_stats.overall FROM basic, module stats WHERE basic.id = module_stats.id and module_stats.overall = 'fail';
+    # SELECT basic.filename, module_stats.overall FROM basic, module stats
+    WHERE basic.id = module_stats.id and module_stats.overall = 'fail';
     # ... whatever else you want to know
-
-If I feel like it, I might add a script that performs some useful queries
-later, but for now, this is it (1/28/16)
 
 You can run tests on the db module by:
 
     python sqlite3_db.py
+
+I guess I could use fadapa (which I found by searching github), or fastqc_parser
+to improve the fastqc file parsing and to allow for more integeration into other
+projects. I will branch this and work on it from here. If you somehow found
+yourself at this repository and you would like to help out, then go right ahead
+and send me a pull request.
+
+I might add some kind of aggregator functionality, using the db. That seems to
+be something that people are interested in doing. There seems to be some repos
+up that have developed some aggregator functionality, and luckily, also in
+python. I will be looking into this as well.

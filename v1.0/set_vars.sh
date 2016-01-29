@@ -1,2 +1,2 @@
 export FASTQC_DB_NAME='fastqc.db'
-export FASTQC_ROOT=$(cwd)
+export FASTQC_ROOT=$(pwd)

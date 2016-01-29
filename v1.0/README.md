@@ -24,3 +24,7 @@ at $FASTQC_DB_NAME or (by default) ./fastqc.db.
 
 If I feel like it, I might add a script that performs some useful queries
 later, but for now, this is it (1/28/16)
+
+You can run tests on the db module by:
+
+    python sqlite3_db.py

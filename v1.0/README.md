@@ -10,6 +10,7 @@ contain, respectively, the basic file information, and the results of the
 tests run by fastqc
 
 Usage:
+
     source set_vars.sh
     ./fastqc_to_sqlite3.py
 

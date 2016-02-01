@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
-from sqlite3_db import sqlite3_db
+from Sqlite3DB import Sqlite3DB
 
 
 def get_fastqc_files(directory=os.getcwd()):
@@ -15,10 +15,11 @@ def get_fastqc_files(directory=os.getcwd()):
 
     return fastqc_files
 
+
 def add_tables(database='fastqc.db'):
-    db = sqlite3_db(database_path=database)
+    db = Sqlite3DB(database_path=database)
     drop_basic = """DROP TABLE IF EXISTS basic;"""
-    create_basic= """
+    create_basic = """
     CREATE TABLE basic (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         filename TEXT,
@@ -78,14 +79,14 @@ def get_basic(fastqc_filename):
                 total_sequences = int(line.split()[-1])
                 continue
             elif line.startswith("Filtered Sequences"):
-                filtered_seqsuences = int(line.split()[-1])
+                filtered_sequences = int(line.split()[-1])
                 continue
             elif line.startswith("Sequence length"):
                 sequence_length = int(line.split()[-1])
                 continue
             elif line.startswith("%GC"):
-               percent_gc = int(line.split()[-1])
-               continue
+                percent_gc = int(line.split()[-1])
+                continue
             else:
                 pass
 
@@ -103,7 +104,7 @@ def get_module_stats(fastqc_filename):
     per_base_n_content = None
     sequence_length_distribution = None
     sequence_duplication_levels = None
-    overreprsented_sequences = None
+    overrepresented_sequences = None
     kmer_content = None
 
     with open(fastqc_filename, "r+") as fastqc_h:
@@ -152,14 +153,14 @@ def get_module_stats(fastqc_filename):
                 overrepresented_sequences, kmer_content)
 
 
-def basic_sql(filelist, database='fastqc.db'):
+def basic_sql(filelist):
     insertions = []
     for filename in filelist:
         insertions.append(get_basic(filename))
     return insertions
 
 
-def module_stats_sql(filelist, database='fastqc.db'):
+def module_stats_sql(filelist):
     insertions = []
     for filename in filelist:
         insertions.append(get_module_stats(filename))
@@ -195,9 +196,10 @@ def populate_db(basic, module_stats, database='fastqc.db'):
             kmer_content)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """
-    db = sqlite3_db(database_path=database)
+    db = Sqlite3DB(database_path=database)
     db.execute(sql_basic, basic)
     db.execute(sql_module_stats, module_stats)
+
 
 def main():
     root_dir = os.environ.get('FASTQC_ROOT') or os.getcwd()
@@ -207,11 +209,12 @@ def main():
     sys.stdout.write("Creating tables 'basic' and 'module_stats'...\n")
     add_tables(database=fastqc_db)
     sys.stdout.write("Generating sql statements for 'basic'...\n")
-    basic = basic_sql(filelist, database=fastqc_db)
+    basic = basic_sql(filelist)
     sys.stdout.write("Generation sql statements for 'module_stats'...\n")
-    module_stats = module_stats_sql(filelist, database=fastqc_db)
+    module_stats = module_stats_sql(filelist)
     sys.stdout.write("Populating database...\n")
     populate_db(basic, module_stats, database=fastqc_db)
+
 
 if __name__ == "__main__":
     main()

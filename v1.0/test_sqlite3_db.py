@@ -1,16 +1,17 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os
 import sys
 import stat
-from sqlite3_db import sqlite3_db
+from Sqlite3DB import Sqlite3DB
 import unittest
 import sqlite3
 
 
-class test_sqlite3_db(unittest.TestCase):
+class TestSqlite3DB(unittest.TestCase):
     def setUp(self):
         self.database = "test.db"
-        self.db = sqlite3_db(database_path=self.database, verbose=1)
+        self.db = Sqlite3DB(database_path=self.database, verbose=1)
         sys.stdout.write("\nLeaving setUp...\n")
 
     def tearDown(self):
@@ -88,7 +89,7 @@ class test_sqlite3_db(unittest.TestCase):
         self.db.execute(sql4, values2)
 
         with self.assertRaises(ValueError):
-            query_results = self.db.execute(sql6, select="kittykat")
+            self.db.execute(sql6, select="kittykat")
 
         with self.assertRaises(AssertionError):
             query_results = self.db.execute(sql6, select=None)
@@ -96,11 +97,12 @@ class test_sqlite3_db(unittest.TestCase):
 
         query_results = self.db.execute(sql6, select="ALL")
         assert(len(query_results) == 7)
+        print(query_results)
         query_results = self.db.execute(sql6, select="ONE")
-        print query_results
+        print(query_results)
         assert(len(query_results) == 2)
 
 
 if __name__ == "__main__":
-    suite = unittest.TestLoader().loadTestsFromTestCase(test_sqlite3_db)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestSqlite3DB)
     unittest.TextTestRunner(verbosity=3).run(suite)

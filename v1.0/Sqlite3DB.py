@@ -6,12 +6,22 @@ import sqlite3
 import time
 
 
-class sqlite3_db:
+class Sqlite3DB:
     def __init__(self, database_path, verbose=0):
         self.database_name = database_path
         self.__conn = None
         self.__curs = None
         self.verbose = verbose
+
+    @staticmethod
+    def __tuplify(an_element):
+        if type(an_element) is not None:
+            if type(an_element) is not tuple:
+                return tuple([an_element])
+            else:
+                return an_element
+        else:
+            return an_element
 
     def __connect(self):
         attempts = 0
@@ -29,7 +39,7 @@ class sqlite3_db:
                 if attempts > 10:
                     raise connection_err
                 try:
-                    os.chmod(self.database_name, stat.I_WRITE)
+                    os.chmod(self.database_name, stat.S_IWRITE)
                 except OSError as e:
                     if self.verbose > 0:
                         sys.stderr.write("Could not chmod {}: {}\n".format(
@@ -65,14 +75,6 @@ class sqlite3_db:
         if self.verbose > 0:
             sys.stdout.write("Acquired {} cursor\n".format(self.database_name))
 
-    def __tuplify(self, an_element):
-        if type(an_element) is not None:
-            if type(an_element) is not tuple:
-                return tuple([an_element])
-            else:
-                return an_element
-        else:
-            return an_element
 
     def __exec_sql(self, sql, values):
         if type(values) is list:
@@ -84,6 +86,7 @@ class sqlite3_db:
 
     def __get_query_result(self, select):
         selection = select.strip().upper()
+
         try:
             assert(selection in ["ALL", "ONE"])
             if selection == "ALL":

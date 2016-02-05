@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+
 from Sqlite3DB import Sqlite3DB
 
 
@@ -110,7 +111,7 @@ def get_module_stats(fastqc_filename):
     with open(fastqc_filename, "r+") as fastqc_h:
         lines = fastqc_h.readlines()
         headers = [line for line in lines if line.startswith(">>") and not
-                   line.startswith(">>END_MODULE")]
+        line.startswith(">>END_MODULE")]
         for line in headers:
             if line.startswith(">>Basic Statistics"):
                 overall = line.split()[-1]

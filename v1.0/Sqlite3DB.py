@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import os
-import sys
-import stat
 import sqlite3
+import stat
+import sys
 import time
 
 
@@ -75,7 +75,6 @@ class Sqlite3DB:
         if self.verbose > 0:
             sys.stdout.write("Acquired {} cursor\n".format(self.database_name))
 
-
     def __exec_sql(self, sql, values):
         if type(values) is list:
             self.__curs.executemany(sql, [self.__tuplify(x) for x in values])
@@ -88,7 +87,7 @@ class Sqlite3DB:
         selection = select.strip().upper()
 
         try:
-            assert(selection in ["ALL", "ONE"])
+            assert (selection in ["ALL", "ONE"])
             if selection == "ALL":
                 return self.__curs.fetchall()
             elif selection == "ONE":

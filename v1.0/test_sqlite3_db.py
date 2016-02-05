@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 from __future__ import print_function
+
 import os
-import sys
-import stat
-from Sqlite3DB import Sqlite3DB
-import unittest
 import sqlite3
+import stat
+import sys
+import unittest
+
+from Sqlite3DB import Sqlite3DB
 
 
 class TestSqlite3DB(unittest.TestCase):
@@ -93,14 +95,14 @@ class TestSqlite3DB(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             query_results = self.db.execute(sql6, select=None)
-            assert(query_results is not None)
+            assert (query_results is not None)
 
         query_results = self.db.execute(sql6, select="ALL")
-        assert(len(query_results) == 7)
+        assert (len(query_results) == 7)
         print(query_results)
         query_results = self.db.execute(sql6, select="ONE")
         print(query_results)
-        assert(len(query_results) == 2)
+        assert (len(query_results) == 2)
 
 
 if __name__ == "__main__":

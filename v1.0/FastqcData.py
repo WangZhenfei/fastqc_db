@@ -4,20 +4,6 @@ import sys
 
 
 class FastqcData:
-    @staticmethod
-    def Summarize(fastqc_data_objects):
-        # Not exactly sure what to do here, maybe pass off to a
-        # well developed summary program or something
-        pass
-
-    @staticmethod
-    def Create_Tables_SQL():
-        pass
-
-    @staticmethod
-    def DROP_Tables_SQL():
-        pass
-
     def __init__(self, fastqc_file="fastqc_data.txt", version="0.10.1"):
         self.fastqc_file = fastqc_file
         self.version = version

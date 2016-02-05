@@ -101,7 +101,6 @@ def get_module_stats(fastqc_filename):
     per_tile_sequence_quality = None
     per_sequence_quality_scores = None
     per_base_sequence_content = None
-    per_base_gc_content = None
     per_sequence_gc_content = None
     per_base_n_content = None
     sequence_length_distribution = None
@@ -154,7 +153,7 @@ def get_module_stats(fastqc_filename):
 
         return (overall, per_base_sequence_quality, per_tile_sequence_quality,
                 per_sequence_quality_scores,
-                per_base_sequence_content, per_base_gc_content,
+                per_base_sequence_content,
                 per_sequence_gc_content, per_base_n_content,
                 sequence_length_distribution, sequence_duplication_levels,
                 overrepresented_sequences, adapter_content, kmer_content)
@@ -192,16 +191,17 @@ def populate_db(basic, module_stats, database='fastqc.db'):
         INSERT INTO module_stats (
             overall,
             per_base_sequence_quality,
+            per_tile_sequence_quality,
             per_sequence_quality_scores,
             per_base_sequence_content,
-            per_base_gc_content,
             per_sequence_gc_content,
             per_base_n_content,
             sequence_length_distribution,
             sequence_duplication_levels,
             overrepresented_sequences,
+            adapter_content,
             kmer_content)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """
     db = Sqlite3DB(database_path=database)
     db.execute(sql_basic, basic)

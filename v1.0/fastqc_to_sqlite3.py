@@ -39,14 +39,15 @@ def add_tables(database='fastqc.db'):
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         overall TEXT,
         per_base_sequence_quality TEXT,
+        per_tile_sequence_quality TEXT,
         per_sequence_quality_scores TEXT,
         per_base_sequence_content TEXT,
-        per_base_gc_content TEXT,
         per_sequence_gc_content TEXT,
         per_base_n_content TEXT,
         sequence_length_distribution TEXT,
         sequence_duplication_levels TEXT,
         overrepresented_sequences TEXT,
+        adapter_content TEXT,
         kmer_content TEXT
     );
     """
@@ -97,6 +98,7 @@ def get_basic(fastqc_filename):
 def get_module_stats(fastqc_filename):
     overall = None
     per_base_sequence_quality = None
+    per_tile_sequence_quality = None
     per_sequence_quality_scores = None
     per_base_sequence_content = None
     per_base_gc_content = None
@@ -105,6 +107,7 @@ def get_module_stats(fastqc_filename):
     sequence_length_distribution = None
     sequence_duplication_levels = None
     overrepresented_sequences = None
+    adapter_content = None
     kmer_content = None
 
     with open(fastqc_filename, "r+") as fastqc_h:
@@ -118,14 +121,14 @@ def get_module_stats(fastqc_filename):
             if line.startswith(">>Per base sequence quality"):
                 per_base_sequence_quality = line.split()[-1]
                 continue
+            if line.startswith(">>Per tile sequence quality"):
+                per_tile_sequence_quality = line.split()[-1]
+                continue
             if line.startswith(">>Per sequence quality"):
                 per_sequence_quality_scores = line.split()[-1]
                 continue
             if line.startswith(">>Per base sequence content"):
                 per_base_sequence_content = line.split()[-1]
-                continue
-            if line.startswith(">>Per base GC content"):
-                per_base_gc_content = line.split()[-1]
                 continue
             if line.startswith(">>Per sequence GC content"):
                 per_sequence_gc_content = line.split()[-1]
@@ -142,15 +145,19 @@ def get_module_stats(fastqc_filename):
             if line.startswith(">>Overrepresented sequences"):
                 overrepresented_sequences = line.split()[-1]
                 continue
+            if line.startswith(">>Adapter Content"):
+                adapter_content = line.split()[-1]
+                continue
             if line.startswith(">>Kmer Content"):
                 kmer_content = line.split()[-1]
                 continue
 
-        return (overall, per_base_sequence_quality, per_sequence_quality_scores,
+        return (overall, per_base_sequence_quality, per_tile_sequence_quality,
+                per_sequence_quality_scores,
                 per_base_sequence_content, per_base_gc_content,
                 per_sequence_gc_content, per_base_n_content,
                 sequence_length_distribution, sequence_duplication_levels,
-                overrepresented_sequences, kmer_content)
+                overrepresented_sequences, adapter_content, kmer_content)
 
 
 def basic_sql(filelist):

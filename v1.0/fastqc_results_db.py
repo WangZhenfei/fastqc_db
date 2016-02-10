@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import print_function
+
 import os
 import sys
 
@@ -6,6 +8,11 @@ from Sqlite3DB import Sqlite3DB
 
 
 def get_fastqc_files(directory=os.getcwd()):
+    """
+    Get fastqc files in the specified directory, by default, current directory
+    :param directory: str: path to fastqc directory root
+    :return: list<str>: list of file paths
+    """
     fastqc_files = []
 
     for root, directories, files in os.walk(directory):
@@ -18,6 +25,11 @@ def get_fastqc_files(directory=os.getcwd()):
 
 
 def add_tables(database='fastqc.db'):
+    """
+    Add tables to the database (basic and module stats)
+    :param database:
+    :return:
+    """
     db = Sqlite3DB(database_path=database)
     drop_basic = """DROP TABLE IF EXISTS basic;"""
     create_basic = """
@@ -26,10 +38,10 @@ def add_tables(database='fastqc.db'):
         filename TEXT,
         filetype TEXT,
         encoding TEXT,
-        total_sequences INTEGER,
-        filtered_sequences INTEGER,
-        sequence_length INTEGER,
-        percent_gc INTEGER
+        total_sequences TEXT,
+        filtered_sequences TEXT,
+        sequence_length TEXT,
+        percent_gc TEXT
     );
     """
     db.execute(drop_basic)
@@ -40,14 +52,15 @@ def add_tables(database='fastqc.db'):
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         overall TEXT,
         per_base_sequence_quality TEXT,
+        per_tile_sequence_quality TEXT,
         per_sequence_quality_scores TEXT,
         per_base_sequence_content TEXT,
-        per_base_gc_content TEXT,
         per_sequence_gc_content TEXT,
         per_base_n_content TEXT,
         sequence_length_distribution TEXT,
         sequence_duplication_levels TEXT,
         overrepresented_sequences TEXT,
+        adapter_content TEXT,
         kmer_content TEXT
     );
     """
@@ -56,6 +69,11 @@ def add_tables(database='fastqc.db'):
 
 
 def get_basic(fastqc_filename):
+    """
+    Gather basic information to the file
+    :param fastqc_filename: filename for the fastqc data file
+    :return: tuple(<str>): values
+    """
     filename = None
     filetype = None
     encoding = None
@@ -77,16 +95,16 @@ def get_basic(fastqc_filename):
                 encoding = " ".join(line.split()[1:])
                 continue
             elif line.startswith("Total Sequences"):
-                total_sequences = int(line.split()[-1])
+                total_sequences = line.split()[-1]
                 continue
             elif line.startswith("Filtered Sequences"):
-                filtered_sequences = int(line.split()[-1])
+                filtered_sequences = line.split()[-1]
                 continue
             elif line.startswith("Sequence length"):
-                sequence_length = int(line.split()[-1])
+                sequence_length = line.split()[-1]
                 continue
             elif line.startswith("%GC"):
-                percent_gc = int(line.split()[-1])
+                percent_gc = line.split()[-1]
                 continue
             else:
                 pass
@@ -96,16 +114,22 @@ def get_basic(fastqc_filename):
 
 
 def get_module_stats(fastqc_filename):
+    """
+    Gather module statistics information
+    :param fastqc_filename: fastqc_data file
+    :return: tuple(<str>): values
+    """
     overall = None
     per_base_sequence_quality = None
+    per_tile_sequence_quality = None
     per_sequence_quality_scores = None
     per_base_sequence_content = None
-    per_base_gc_content = None
     per_sequence_gc_content = None
     per_base_n_content = None
     sequence_length_distribution = None
     sequence_duplication_levels = None
     overrepresented_sequences = None
+    adapter_content = None
     kmer_content = None
 
     with open(fastqc_filename, "r+") as fastqc_h:
@@ -119,14 +143,14 @@ def get_module_stats(fastqc_filename):
             if line.startswith(">>Per base sequence quality"):
                 per_base_sequence_quality = line.split()[-1]
                 continue
+            if line.startswith(">>Per tile sequence quality"):
+                per_tile_sequence_quality = line.split()[-1]
+                continue
             if line.startswith(">>Per sequence quality"):
                 per_sequence_quality_scores = line.split()[-1]
                 continue
             if line.startswith(">>Per base sequence content"):
                 per_base_sequence_content = line.split()[-1]
-                continue
-            if line.startswith(">>Per base GC content"):
-                per_base_gc_content = line.split()[-1]
                 continue
             if line.startswith(">>Per sequence GC content"):
                 per_sequence_gc_content = line.split()[-1]
@@ -143,25 +167,39 @@ def get_module_stats(fastqc_filename):
             if line.startswith(">>Overrepresented sequences"):
                 overrepresented_sequences = line.split()[-1]
                 continue
+            if line.startswith(">>Adapter Content"):
+                adapter_content = line.split()[-1]
+                continue
             if line.startswith(">>Kmer Content"):
                 kmer_content = line.split()[-1]
                 continue
 
-        return (overall, per_base_sequence_quality, per_sequence_quality_scores,
-                per_base_sequence_content, per_base_gc_content,
+        return (overall, per_base_sequence_quality, per_tile_sequence_quality,
+                per_sequence_quality_scores,
+                per_base_sequence_content,
                 per_sequence_gc_content, per_base_n_content,
                 sequence_length_distribution, sequence_duplication_levels,
-                overrepresented_sequences, kmer_content)
+                overrepresented_sequences, adapter_content, kmer_content)
 
 
 def basic_sql(filelist):
+    """
+    For each fastqc file, get basic information
+    :param filelist: fastqc_data file list
+    :return: list<tuple<str>>: list of insertions
+    """
     insertions = []
     for filename in filelist:
-        insertions.append(get_basic(filename))
+        insertions += [get_basic(filename)]
     return insertions
 
 
 def module_stats_sql(filelist):
+    """
+    For each fastqc file, get module stats
+    :param filelist: fastqc_data file list
+    :return: list<tuple<str>>: list of insertions
+    """
     insertions = []
     for filename in filelist:
         insertions.append(get_module_stats(filename))
@@ -169,6 +207,13 @@ def module_stats_sql(filelist):
 
 
 def populate_db(basic, module_stats, database='fastqc.db'):
+    """
+    Populate the database using the values scraped from the fastqc_data files
+    :param basic: <list>: list of basic sql values
+    :param module_stats: <list>: list of module stats values
+    :param database: <str>: name of databases (can be path)
+    :return:
+    """
     sql_basic = """
         INSERT INTO basic (
             filename,
@@ -186,16 +231,17 @@ def populate_db(basic, module_stats, database='fastqc.db'):
         INSERT INTO module_stats (
             overall,
             per_base_sequence_quality,
+            per_tile_sequence_quality,
             per_sequence_quality_scores,
             per_base_sequence_content,
-            per_base_gc_content,
             per_sequence_gc_content,
             per_base_n_content,
             sequence_length_distribution,
             sequence_duplication_levels,
             overrepresented_sequences,
+            adapter_content,
             kmer_content)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """
     db = Sqlite3DB(database_path=database)
     db.execute(sql_basic, basic)
@@ -203,17 +249,24 @@ def populate_db(basic, module_stats, database='fastqc.db'):
 
 
 def main():
+    """
+    Create a database of the results of the fastqc_data files in the directory
+    located at FASTQC_ROOT or the current working directory. The database name
+    is FASTQC_DB_NAME or 'fastqc.db'. Makes tables, add module test results to
+    the tables
+    :return:
+    """
     root_dir = os.environ.get('FASTQC_ROOT') or os.getcwd()
     fastqc_db = os.environ.get('FASTQC_DB_NAME') or 'fastqc.db'
-    sys.stdout.write("Getting file list...\n")
+    print("Getting file list...\n", file=sys.stdout)
     filelist = get_fastqc_files(directory=root_dir)
-    sys.stdout.write("Creating tables 'basic' and 'module_stats'...\n")
+    print("Creating tables 'basic' and 'module_stats'...\n", file=sys.stdout)
     add_tables(database=fastqc_db)
-    sys.stdout.write("Generating sql statements for 'basic'...\n")
+    print("Generating sql statements for 'basic'...\n", file=sys.stdout)
     basic = basic_sql(filelist)
-    sys.stdout.write("Generation sql statements for 'module_stats'...\n")
+    print("Generation sql statements for 'module_stats'...\n", file=sys.stdout)
     module_stats = module_stats_sql(filelist)
-    sys.stdout.write("Populating database...\n")
+    print("Populating database...\n", file=sys.stdout)
     populate_db(basic, module_stats, database=fastqc_db)
 
 

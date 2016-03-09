@@ -1,0 +1,12 @@
+PASS	Basic Statistics	DDP7_S7_H2VF3_L002_R1_001.fastq
+PASS	Per base sequence quality	DDP7_S7_H2VF3_L002_R1_001.fastq
+PASS	Per tile sequence quality	DDP7_S7_H2VF3_L002_R1_001.fastq
+PASS	Per sequence quality scores	DDP7_S7_H2VF3_L002_R1_001.fastq
+WARN	Per base sequence content	DDP7_S7_H2VF3_L002_R1_001.fastq
+PASS	Per sequence GC content	DDP7_S7_H2VF3_L002_R1_001.fastq
+PASS	Per base N content	DDP7_S7_H2VF3_L002_R1_001.fastq
+PASS	Sequence Length Distribution	DDP7_S7_H2VF3_L002_R1_001.fastq
+PASS	Sequence Duplication Levels	DDP7_S7_H2VF3_L002_R1_001.fastq
+PASS	Overrepresented sequences	DDP7_S7_H2VF3_L002_R1_001.fastq
+PASS	Adapter Content	DDP7_S7_H2VF3_L002_R1_001.fastq
+PASS	Kmer Content	DDP7_S7_H2VF3_L002_R1_001.fastq

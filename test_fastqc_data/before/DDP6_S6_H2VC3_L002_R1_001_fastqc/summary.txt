@@ -1,0 +1,12 @@
+PASS	Basic Statistics	DDP6_S6_H2VC3_L002_R1_001.fastq
+PASS	Per base sequence quality	DDP6_S6_H2VC3_L002_R1_001.fastq
+PASS	Per tile sequence quality	DDP6_S6_H2VC3_L002_R1_001.fastq
+PASS	Per sequence quality scores	DDP6_S6_H2VC3_L002_R1_001.fastq
+WARN	Per base sequence content	DDP6_S6_H2VC3_L002_R1_001.fastq
+PASS	Per sequence GC content	DDP6_S6_H2VC3_L002_R1_001.fastq
+PASS	Per base N content	DDP6_S6_H2VC3_L002_R1_001.fastq
+PASS	Sequence Length Distribution	DDP6_S6_H2VC3_L002_R1_001.fastq
+PASS	Sequence Duplication Levels	DDP6_S6_H2VC3_L002_R1_001.fastq
+PASS	Overrepresented sequences	DDP6_S6_H2VC3_L002_R1_001.fastq
+PASS	Adapter Content	DDP6_S6_H2VC3_L002_R1_001.fastq
+PASS	Kmer Content	DDP6_S6_H2VC3_L002_R1_001.fastq

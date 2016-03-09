@@ -1,0 +1,12 @@
+PASS	Basic Statistics	DDP8_S8_H2VC3_L005_R1_001.fastq
+PASS	Per base sequence quality	DDP8_S8_H2VC3_L005_R1_001.fastq
+PASS	Per tile sequence quality	DDP8_S8_H2VC3_L005_R1_001.fastq
+PASS	Per sequence quality scores	DDP8_S8_H2VC3_L005_R1_001.fastq
+WARN	Per base sequence content	DDP8_S8_H2VC3_L005_R1_001.fastq
+PASS	Per sequence GC content	DDP8_S8_H2VC3_L005_R1_001.fastq
+PASS	Per base N content	DDP8_S8_H2VC3_L005_R1_001.fastq
+PASS	Sequence Length Distribution	DDP8_S8_H2VC3_L005_R1_001.fastq
+PASS	Sequence Duplication Levels	DDP8_S8_H2VC3_L005_R1_001.fastq
+PASS	Overrepresented sequences	DDP8_S8_H2VC3_L005_R1_001.fastq
+PASS	Adapter Content	DDP8_S8_H2VC3_L005_R1_001.fastq
+PASS	Kmer Content	DDP8_S8_H2VC3_L005_R1_001.fastq

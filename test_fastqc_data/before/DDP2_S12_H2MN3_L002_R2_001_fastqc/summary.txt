@@ -1,0 +1,12 @@
+PASS	Basic Statistics	DDP2_S12_H2MN3_L002_R2_001.fastq
+PASS	Per base sequence quality	DDP2_S12_H2MN3_L002_R2_001.fastq
+WARN	Per tile sequence quality	DDP2_S12_H2MN3_L002_R2_001.fastq
+PASS	Per sequence quality scores	DDP2_S12_H2MN3_L002_R2_001.fastq
+WARN	Per base sequence content	DDP2_S12_H2MN3_L002_R2_001.fastq
+PASS	Per sequence GC content	DDP2_S12_H2MN3_L002_R2_001.fastq
+PASS	Per base N content	DDP2_S12_H2MN3_L002_R2_001.fastq
+PASS	Sequence Length Distribution	DDP2_S12_H2MN3_L002_R2_001.fastq
+PASS	Sequence Duplication Levels	DDP2_S12_H2MN3_L002_R2_001.fastq
+PASS	Overrepresented sequences	DDP2_S12_H2MN3_L002_R2_001.fastq
+PASS	Adapter Content	DDP2_S12_H2MN3_L002_R2_001.fastq
+PASS	Kmer Content	DDP2_S12_H2MN3_L002_R2_001.fastq

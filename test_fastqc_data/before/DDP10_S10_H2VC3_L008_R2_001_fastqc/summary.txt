@@ -1,0 +1,12 @@
+PASS	Basic Statistics	DDP10_S10_H2VC3_L008_R2_001.fastq
+PASS	Per base sequence quality	DDP10_S10_H2VC3_L008_R2_001.fastq
+FAIL	Per tile sequence quality	DDP10_S10_H2VC3_L008_R2_001.fastq
+PASS	Per sequence quality scores	DDP10_S10_H2VC3_L008_R2_001.fastq
+WARN	Per base sequence content	DDP10_S10_H2VC3_L008_R2_001.fastq
+PASS	Per sequence GC content	DDP10_S10_H2VC3_L008_R2_001.fastq
+PASS	Per base N content	DDP10_S10_H2VC3_L008_R2_001.fastq
+PASS	Sequence Length Distribution	DDP10_S10_H2VC3_L008_R2_001.fastq
+PASS	Sequence Duplication Levels	DDP10_S10_H2VC3_L008_R2_001.fastq
+PASS	Overrepresented sequences	DDP10_S10_H2VC3_L008_R2_001.fastq
+PASS	Adapter Content	DDP10_S10_H2VC3_L008_R2_001.fastq
+FAIL	Kmer Content	DDP10_S10_H2VC3_L008_R2_001.fastq

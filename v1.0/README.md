@@ -26,12 +26,3 @@ at $FASTQC_DB_NAME or (by default) ./fastqc.db.
 You can run tests on the db module by:
 
     python test_sqlite3_db.py
-
-I looked into fadapa and it looks like a very basic module that was designed
-to learn about using installation resources and about deployment. I will be
-writing my own parsing module for the data files, which will probably mean
-taking the script that I already have and turning it into the parse method
-for a new object.
-
-I plan to add some more in depth statistics for the parsing as well, and maybe
-a UI at some point, if the need arises in my lab.

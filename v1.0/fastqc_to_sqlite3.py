@@ -25,10 +25,10 @@ def add_tables(database='fastqc.db'):
         filename TEXT,
         filetype TEXT,
         encoding TEXT,
-        total_sequences INTEGER,
-        filtered_sequences INTEGER,
-        sequence_length INTEGER,
-        percent_gc INTEGER
+        total_sequences TEXT,
+        filtered_sequences TEXT,
+        sequence_length TEXT,
+        percent_gc TEXT
     );
     """
     db.execute(drop_basic)
@@ -77,16 +77,16 @@ def get_basic(fastqc_filename):
                 encoding = " ".join(line.split()[1:])
                 continue
             elif line.startswith("Total Sequences"):
-                total_sequences = int(line.split()[-1])
+                total_sequences = line.split()[-1]
                 continue
             elif line.startswith("Filtered Sequences"):
-                filtered_sequences = int(line.split()[-1])
+                filtered_sequences = line.split()[-1]
                 continue
             elif line.startswith("Sequence length"):
-                sequence_length = int(line.split()[-1])
+                sequence_length = line.split()[-1]
                 continue
             elif line.startswith("%GC"):
-                percent_gc = int(line.split()[-1])
+                percent_gc = line.split()[-1]
                 continue
             else:
                 pass

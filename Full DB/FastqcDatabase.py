@@ -1,4 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+import sys
+
+sys.path.insert(0, "..")
 from Sqlite3DB import Sqlite3DB
 
 

@@ -1,9 +1,6 @@
-#!/usr/bin/env python
-from __future__ import print_function
-
+#!/usr/bin/env python3
 import sqlite3
 import sys
-from itertools import izip
 
 from FastqcModule import FastqcModule
 
@@ -19,7 +16,7 @@ class FastqcData:
         """
 
         def grouped(iterable, n):
-            return izip(*[iter(iterable)] * n)
+            return zip(*[iter(iterable)] * n)
 
         modules = []
         indices = [i for i, x in enumerate(module_lines) if x.starswith(">>")]
@@ -150,7 +147,7 @@ class FastqcData:
         """
         if protocol is sqlite3.PrepareProtocol:
             module_conformation = ''.join(
-                [x.get_conf() for x in self.__modules.itervalues()])
+                [x.get_conf() for x in self.__modules.values()])
             return """{fastqc_filename}:{module_stats}""".format(
                 fastqc_filename=self.fastqc_file,
                 module_stats=module_conformation)

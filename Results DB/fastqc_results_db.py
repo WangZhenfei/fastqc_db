@@ -1,9 +1,8 @@
-#!/usr/bin/env python
-from __future__ import print_function
-
+#!/usr/bin/env python3
 import os
 import sys
 
+sys.path.insert(0, "..")
 from Sqlite3DB import Sqlite3DB
 
 

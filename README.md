@@ -15,7 +15,7 @@ Usage:
     ./fastqc_to_sqlite3.py
 
 Then you can take a good look at your fastqc data using the database located
-at $FASTQC_DB_NAME or (by default) ./fastqc.db.
+at $FASTQC_DB_NAME or (by default) ./fastqc.db
 
     sqlite3 fastqc.db
     # SELECT * FROM basic;

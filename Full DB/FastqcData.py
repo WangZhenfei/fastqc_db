@@ -1,40 +1,72 @@
 #!/usr/bin/env python3
 import sqlite3
 import sys
+from os.path import basename
+from zipfile import ZipFile
 
 from FastqcModule import FastqcModule
 
 
+# TODO: Should the table creation sql ever belong to this class?
+# TODO: Ever worthwhile to dynamically detect and add module table names?
+# TODO: Cleaner way to parse from fastqc archive?
+# TODO: Specify modules top down, with default a list of all modules?
+# TODO: perhaps table creation should actually be an instance method?
+# TODO: Class CRUD to make SQL efficient for large numbers of instances
+
 class FastqcData:
+    MODULE_GRAPH = {
+        'key': 'val',
+        'key2': 'val2'
+    }  # Dictionary of parsed mdoule names and their graph names
+    TABLE_NAME = 'fastqc_archive'
+
     @staticmethod
-    def parse_modules(module_lines):
+    def parse_modules(cls, fastqc_data_zip):
         """
         Return a list of FastqcModule objects that have been populated with
         Module information from the passed lines of a read fastqc_data file
-        :param module_lines: list: Lines of the fastqc_data file
+        :param fastqc_data_zip: str: The fastqc zip file
         :return: list<FastqcModule>
         """
+        modules = []
 
         def grouped(iterable, n):
             return zip(*[iter(iterable)] * n)
 
-        modules = []
-        indices = [i for i, x in enumerate(module_lines) if x.starswith(">>")]
+        with ZipFile(fastqc_data_zip, 'r') as zip:
+            base = basename(fastqc_data_zip)  # contains same name directory
 
-        for index_pair in grouped(sorted(indices), 2):
-            subset_module_lines = module_lines[index_pair[0]:index_pair[1]]
-            modules += [FastqcModule().populate(subset_module_lines)]
-        return modules
+            module_lines = zip.open(
+                "{}/fastqc_data.txt".format(base)
+            ).readlines()
+
+            idxs = [i for i, x in enumerate(module_lines) if x.starswith(">>")]
+            for index_pair in grouped(sorted(idxs), 2):
+                # Subset the fastqc data txt file by the module boundaries
+                # as delimited by '>>' characters at the beginning of lines.
+                # Then, send that information to the module information and
+                # use it to create a module object.
+                subset_module_lines = module_lines[index_pair[0]:index_pair[1]]
+                modules += [FastqcModule().populate(subset_module_lines)]
+
+            # IF this module is known to have a graph, get it and add it
+            for module in modules:
+                if module.name in cls.MODULE_GRAPH.keys():
+                    module.graph_blob = zip.open(
+                        cls.MODULE_GRAPH[module.name]).read()
+
+        return (modules)
 
     @staticmethod
-    def drop_tables_sql(names):
+    def drop_tables_sql(cls, names):
         """
         Generates SQL for tables with name in [names] that have id, result, and
         raw_data as columns with types INTEGER, TEXT, and TEXT
         :param names: names of the tables
         :return: list<str>: SQL for each table
         """
-        tables = [("DROP TABLE file IF EXISTS;")]
+        tables = [("DROP TABLE {table_name} IF EXISTS;").format(cls.TABLE_NAME)]
 
         def table_sql(n):
             return "DROP TABLE {tab} IF EXISTS;".format(tab=n)
@@ -42,7 +74,7 @@ class FastqcData:
         return tables.extend([table_sql(name) for name in names])
 
     @staticmethod
-    def create_tables_sql(names):
+    def create_tables_sql(cls, names):
         """
         Generates SQL for tables with name in [names] that have id,
         result, and raw_data as their column names, all of types INTEGER, TEXT,
@@ -50,8 +82,9 @@ class FastqcData:
         :param names: names of the tables
         :return: list<str>: SQL for each table
         """
-        tables = [("CREATE TABLE file (id INTEGER KEY AUTOINCREMENT,"
-                   "file_name TEXT UNIQUE) IF NOT EXISTS;")]
+        tables = [("CREATE TABLE {table_name} (id INTEGER KEY AUTOINCREMENT,"
+                   "file_name TEXT UNIQUE) IF NOT EXISTS;").format(
+            cls.TABLE_NAME)]
 
         def table_sql(n):
             return "CREATE TABLE {tab} (id INTEGER PRIMARY KEY AUTOINCREMENT, \
@@ -60,7 +93,7 @@ class FastqcData:
         return tables.extend([table_sql(name) for name in names])
 
     def __init__(self, fastqc_file="fastqc_data.txt", version="0.10.1"):
-        self.fastqc_file = fastqc_file
+        self.fastqc_file = fastqc_file  # The Zip Archive containing results
         self.version = version
         self.__modules = {}
 
@@ -87,10 +120,8 @@ class FastqcData:
         Using the fastqc_data file, create and populate module information
         :return:
         """
-        with open(self.fastqc_file, "r+") as fastqc_file:
-            fastqc_content = fastqc_file.readlines()
-            for module in FastqcData.parse_modules(fastqc_content):
-                self.__modules[module.name] = module
+        for module in FastqcModule.parse_modules(self.fastqc_file):
+            self.__modules[module.name] = module
 
     def insertion_sql(self):
         """

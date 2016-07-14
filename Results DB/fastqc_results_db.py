@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 import sys
-
 sys.path.insert(0, "..")
 from Sqlite3DB import Sqlite3DB
 
@@ -108,8 +107,13 @@ def get_basic(fastqc_filename):
             else:
                 pass
 
-        return (filename, filetype, encoding, total_sequences,
-                filtered_sequences, sequence_length, percent_gc)
+        return (filename,
+                filetype,
+                encoding,
+                total_sequences,
+                filtered_sequences,
+                sequence_length,
+                percent_gc)
 
 
 def get_module_stats(fastqc_filename):
@@ -173,12 +177,18 @@ def get_module_stats(fastqc_filename):
                 kmer_content = line.split()[-1]
                 continue
 
-        return (overall, per_base_sequence_quality, per_tile_sequence_quality,
+        return (overall,
+                per_base_sequence_quality,
+                per_tile_sequence_quality,
                 per_sequence_quality_scores,
                 per_base_sequence_content,
-                per_sequence_gc_content, per_base_n_content,
-                sequence_length_distribution, sequence_duplication_levels,
-                overrepresented_sequences, adapter_content, kmer_content)
+                per_sequence_gc_content,
+                per_base_n_content,
+                sequence_length_distribution,
+                sequence_duplication_levels,
+                overrepresented_sequences,
+                adapter_content,
+                kmer_content)
 
 
 def basic_sql(filelist):
@@ -247,7 +257,7 @@ def populate_db(basic, module_stats, database='fastqc.db'):
     db.execute(sql_module_stats, module_stats)
 
 
-def main():
+def main(args):
     """
     Create a database of the results of the fastqc_data files in the directory
     located at FASTQC_ROOT or the current working directory. The database name
@@ -255,19 +265,27 @@ def main():
     the tables
     :return:
     """
-    root_dir = os.environ.get('FASTQC_ROOT') or os.getcwd()
-    fastqc_db = os.environ.get('FASTQC_DB_NAME') or 'fastqc.db'
-    print("Getting file list...\n", file=sys.stdout)
-    filelist = get_fastqc_files(directory=root_dir)
-    print("Creating tables 'basic' and 'module_stats'...\n", file=sys.stdout)
-    add_tables(database=fastqc_db)
-    print("Generating sql statements for 'basic'...\n", file=sys.stdout)
-    basic = basic_sql(filelist)
-    print("Generation sql statements for 'module_stats'...\n", file=sys.stdout)
-    module_stats = module_stats_sql(filelist)
-    print("Populating database...\n", file=sys.stdout)
-    populate_db(basic, module_stats, database=fastqc_db)
+    root_dir = ""
+    fastqc_db = ""
+
+    if len(args) != 3:
+        print("fastqc_results_db.py <fastqc_root> <database_name>")
+    else:
+        root_dir = args[1]
+        fastqc_db = args[2]
+        print("Getting file list...\n", file=sys.stdout)
+        filelist = get_fastqc_files(directory=root_dir)
+        print("Creating tables 'basic' and 'module_stats'...\n",
+              file=sys.stdout)
+        add_tables(database=fastqc_db)
+        print("Generating sql statements for 'basic'...\n", file=sys.stdout)
+        basic = basic_sql(filelist)
+        print("Generation sql statements for 'module_stats'...\n",
+              file=sys.stdout)
+        module_stats = module_stats_sql(filelist)
+        print("Populating database...\n", file=sys.stdout)
+        populate_db(basic, module_stats, database=fastqc_db)
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)

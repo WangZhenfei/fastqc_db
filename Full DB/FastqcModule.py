@@ -8,22 +8,24 @@ class FastqcModule:
         self.table_name = None
         self.result = None
         self.raw_data = None
+        self.graph_blob = None
 
-    def populate(self, lines):
+    def populate(self, lines, graph_blob=""):
         header = lines[0].split()
-        self.name = header[:-1].join().replace(">>", "")
+        self.name = "_".join(header[:-1]).replace(">>", "")
         self.table_name = self.name.replace(" ", "_")
         self.result = header[-1]
         self.raw_data = lines[1:].join('\n')
+        self.graph_blob = graph_blob
 
     def insertion_sql(self):
-        return ["INSERT INTO {} VALUES (?, ?);".format(self.table_name),
-                (self.result, self.raw_data)]
+        return ["INSERT INTO {} VALUES (?, ?, ?);".format(self.table_name),
+                (self.result, self.raw_data, self.graph_blob)]
 
     def deletion_sql(self):
         return [("DELETE FROM {} "
-                 "WHERE result = ? AND raw_data = ?;").format(self.table_name),
-                (self.result, self.raw_data)]
+                 "WHERE result = ? AND raw_data = ? AND graph = ?;").format(
+            self.table_name), (self.result, self.raw_data, self.graph_blob)]
 
     def __conform__(self, protocol):
         """
@@ -34,10 +36,12 @@ class FastqcModule:
         :return:
         """
         if protocol is sqlite3.PrepareProtocol:
-            return " ({name}:{result};{data};) ".format(
+            return " ({name}:{result};{data};{blob}) ".format(
                 name=self.name,
                 result=self.result,
-                data=self.raw_data)
+                data=self.raw_data,
+                blob=self.graph_blob
+            )  # conform
 
     def get_conf(self, protocol):
         """
@@ -52,7 +56,9 @@ class FastqcModule:
         print string representation of module object
         :return:
         """
-        return " ({name}:{result};{data};) ".format(
+        return " ({name}:{result};{data};{blob}) ".format(
             name=self.name,
             result=self.result,
-            data=self.raw_data)
+            data=self.raw_data,
+            blob=self.graph_blob
+        )  # repr

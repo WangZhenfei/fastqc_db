@@ -1,27 +1,31 @@
 #!/usr/bin/env python3
-import sqlite3
 import sys
+from collections import OrderedDict
 from os.path import basename
+from os.path import splitext
 from zipfile import ZipFile
 
 from FastqcModule import FastqcModule
 
 
-# TODO: Should the table creation sql ever belong to this class?
-# TODO: Ever worthwhile to dynamically detect and add module table names?
-# TODO: Cleaner way to parse from fastqc archive?
-# TODO: Specify modules top down, with default a list of all modules?
-# TODO: perhaps table creation should actually be an instance method?
-# TODO: Class CRUD to make SQL efficient for large numbers of instances
+# TODO: Add Update and Select operations
 
 class FastqcData:
     MODULE_GRAPH = {
-        'key': 'val',
-        'key2': 'val2'
-    }  # Dictionary of parsed mdoule names and their graph names
+        'adapter_content': 'adapter_content.png',
+        'per_base_n_content': 'per_base_n_content.png',
+        'per_sequence_gc_content': 'per_sequence_gc_content.png',
+        'sequence_length_distribution': 'sequence_length_distribution.png',
+        'sequence_duplication_levels': 'duplication_levels.png',
+        'per_base_sequence_quality': 'per_base_quality.png',
+        'per_sequence_quality_scores': 'per_sequence_quality.png',
+        'kmer_content': 'kmer_profiles.png',
+        'per_base_sequence_content': 'per_base_sequence_content.png',
+        'per_tile_sequence_quality': 'per_tile_quality.png'
+    }  # Dictionary of parsed module names and their graph names
+
     TABLE_NAME = 'fastqc_archive'
 
-    @staticmethod
     def parse_modules(cls, fastqc_data_zip):
         """
         Return a list of FastqcModule objects that have been populated with
@@ -34,27 +38,40 @@ class FastqcData:
         def grouped(iterable, n):
             return zip(*[iter(iterable)] * n)
 
-        with ZipFile(fastqc_data_zip, 'r') as zip:
-            base = basename(fastqc_data_zip)  # contains same name directory
+        with ZipFile(fastqc_data_zip, 'r') as zipfile:
+            base = splitext(basename(fastqc_data_zip))[
+                0]  # contains same name directory
 
-            module_lines = zip.open(
+            module_lines = zipfile.open(
                 "{}/fastqc_data.txt".format(base)
             ).readlines()
 
-            idxs = [i for i, x in enumerate(module_lines) if x.starswith(">>")]
+            _module_lines = list(module_lines)
+            module_lines = [line.decode('utf-8') for line in _module_lines]
+
+            idxs = [i for i, x in enumerate(module_lines) if x.startswith(">>")]
             for index_pair in grouped(sorted(idxs), 2):
                 # Subset the fastqc data txt file by the module boundaries
                 # as delimited by '>>' characters at the beginning of lines.
                 # Then, send that information to the module information and
                 # use it to create a module object.
                 subset_module_lines = module_lines[index_pair[0]:index_pair[1]]
-                modules += [FastqcModule().populate(subset_module_lines)]
+                module = FastqcModule()
+                module.populate(subset_module_lines)
+                modules += [module]
 
             # IF this module is known to have a graph, get it and add it
             for module in modules:
-                if module.name in cls.MODULE_GRAPH.keys():
-                    module.graph_blob = zip.open(
-                        cls.MODULE_GRAPH[module.name]).read()
+                if module.table_name in cls.MODULE_GRAPH.keys():
+                    try:
+                        module.graph_blob = zipfile.open(
+                            "{}/Images/{}".format(base,
+                                                  cls.MODULE_GRAPH[
+                                                      module.table_name
+                                                  ])
+                        ).read()
+                    except KeyError:
+                        print("No {} graph found".format(module.table_name))
 
         return (modules)
 
@@ -73,8 +90,7 @@ class FastqcData:
 
         return tables.extend([table_sql(name) for name in names])
 
-    @staticmethod
-    def create_tables_sql(cls, names):
+    def create_tables_sql(self):
         """
         Generates SQL for tables with name in [names] that have id,
         result, and raw_data as their column names, all of types INTEGER, TEXT,
@@ -82,20 +98,24 @@ class FastqcData:
         :param names: names of the tables
         :return: list<str>: SQL for each table
         """
-        tables = [("CREATE TABLE {table_name} (id INTEGER KEY AUTOINCREMENT,"
-                   "file_name TEXT UNIQUE) IF NOT EXISTS;").format(
-            cls.TABLE_NAME)]
+        tables = [("CREATE TABLE IF NOT EXISTS {table_name} "
+                   "(id INTEGER PRIMARY KEY, file_name TEXT UNIQUE, "
+                   "version TEXT);").format(table_name=self.TABLE_NAME)]
 
         def table_sql(n):
-            return "CREATE TABLE {tab} (id INTEGER PRIMARY KEY AUTOINCREMENT, \
-                result TEXT, raw_data TEXT) IF NOT EXISTS;".format(tab=n)
+            return ("CREATE TABLE IF NOT EXISTS {tab} (id INTEGER PRIMARY KEY, "
+                    "result TEXT, raw_data TEXT, graph BLOB);").format(tab=n)
 
-        return tables.extend([table_sql(name) for name in names])
+        tables.extend([table_sql(name) for name in self.module_names()])
+        return tables
 
-    def __init__(self, fastqc_file="fastqc_data.txt", version="0.10.1"):
+    def __init__(self, fastqc_file="data_fastqc.zip", version="0.11.5"):
         self.fastqc_file = fastqc_file  # The Zip Archive containing results
         self.version = version
-        self.__modules = {}
+        self.__modules = OrderedDict()
+
+    def module_names(self):
+        return [x.table_name for x in self.__modules.values()]
 
     def get_module(self, name):
         try:
@@ -120,7 +140,7 @@ class FastqcData:
         Using the fastqc_data file, create and populate module information
         :return:
         """
-        for module in FastqcModule.parse_modules(self.fastqc_file):
+        for module in self.parse_modules(self.fastqc_file):
             self.__modules[module.name] = module
 
     def insertion_sql(self):
@@ -131,28 +151,10 @@ class FastqcData:
         :return: list<tuple(str, tuple(str,str))>: insertion sql for this file
         """
         sql_statements = []
-        for module in self.__modules:
+        for module in self.__modules.values():
             sql_statements += [module.insertion_sql()]
 
         return sql_statements
-
-    def update_sql(self, modules, values):
-        """
-        SQL to Update this item
-        TODO: how to do this?
-        :modules: TODO
-        :values: TODO
-        :return:
-        """
-        pass
-
-    def select_sql(self, mode):
-        """
-        SQL to select this object from DB
-        :param mode: TODO
-        :return: TODO
-        """
-        pass
 
 
     def deletion_sql(self):
@@ -166,19 +168,3 @@ class FastqcData:
             sql_statements += [module.deletion_sql()]
 
         return sql_statements
-
-    def __conform__(self, protocol):
-        """
-        Conforms this object for use with data storage / transfer protocols,
-        including sqlite3. Makes a structure for each file:
-        fastqc_filename:(module_name:result;data;)(module_name:result;data;)...
-        in sqlite3.
-        :param protocol: The data transfer protocol to be used
-        :return: str: protocol representation of this object
-        """
-        if protocol is sqlite3.PrepareProtocol:
-            module_conformation = ''.join(
-                [x.get_conf() for x in self.__modules.values()])
-            return """{fastqc_filename}:{module_stats}""".format(
-                fastqc_filename=self.fastqc_file,
-                module_stats=module_conformation)

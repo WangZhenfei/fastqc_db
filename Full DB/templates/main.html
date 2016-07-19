@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}FastQC DB{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>View Results</h1>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-1">
+            <a href="{{ url_for('all') }}"
+               class="btn btn-lg btn-primary">ALL</a>
+            <a href="{{ url_for('passed') }}" class="btn btn-lg btn-success">PASS</a>
+            <a href="{{ url_for('warned') }}" class="btn btn-lg btn-warning">WARN</a>
+            <a href="{{ url_for('failed') }}"
+               class="btn btn-lg btn-danger">FAIL</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

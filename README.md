@@ -53,10 +53,12 @@ this application requires Flask to be installed (either on the system, or using
 a virtualenv).
 
 Usage:
-python3 Full\ DB/fastqc_db.py <input_root> <database_name.db>
+
+    python3 Full\ DB/fastqc_db.py <input_root> <database_name.db>
 
 The results DB searches a directory for fastqc_data.txt files and reads them
 into a database
 
 Usage:
-python3 Results\ DB/fastqc_results_db.py <input_root> <database_name.db>
+
+    python3 Results\ DB/fastqc_results_db.py <input_root> <database_name.db>

@@ -18,6 +18,7 @@ The full version creates a DB with the following schema:
     CREATE TABLE kmer_content (id INTEGER PRIMARY KEY, result TEXT, raw_data TEXT, graph BLOB);
 
 The results db creates a DB with the schema:
+
     CREATE TABLE basic (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         filename TEXT,

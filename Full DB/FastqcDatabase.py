@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 from collections import OrderedDict
-
+from copy import deepcopy
 sys.path.insert(0, "..")
 from Sqlite3DB import Sqlite3DB
 from FastqcData import FastqcData
@@ -35,24 +35,59 @@ class FastqcDatabase(Sqlite3DB):
                     self.insert(data)
 
     def load_from_db(self):
-        # TODO: populate fastqc_records from an already created database
         pass
 
     def get_all(self):
-        # TODO
-        return OrderedDict()
+        return self.fastqc_records
+
+    def get_only(self, result):
+        copy_dict = deepcopy(self.fastqc_records)
+
+        for key, val in copy_dict.items():
+            for modkey, module in deepcopy(val.modules).items():
+                if module.result != result:
+                    del (val.modules[modkey])
+
+        return copy_dict
 
     def get_passed(self):
-        # TODO
-        return OrderedDict()
+        passed = OrderedDict()
+        for key, val in self.fastqc_records.items():
+            has_fail = False
+            for module in val.modules.values():
+                if module.result == "fail":
+                    has_fail = True
+
+            if not has_fail:
+                passed[key] = val
+
+        return passed
 
     def get_warned(self):
-        # TODO
-        return OrderedDict()
+        warn = OrderedDict()
+        for key, val in self.fastqc_records.items():
+            has_warn = False
+            for module in val.modules.values():
+                if module.result == "warn":
+                    has_warn = True
+
+            if has_warn:
+                warn[key] = val
+
+        return warn
 
     def get_failed(self):
-        # TODO
-        return OrderedDict()
+        failed = OrderedDict()
+        for key, val in self.fastqc_records.items():
+            has_fail = False
+            for module in val.modules.values():
+                if module.result == "fail":
+                    has_fail = True
+
+            if has_fail:
+                failed[key] = val
+
+        return failed
 
     def __remove_record(self, key):
         try:

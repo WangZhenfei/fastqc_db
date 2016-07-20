@@ -3,22 +3,44 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block page_content %}
-<div class="container">
-
-    {% for record in records %}
-    <div class="container">
-        <tr>
-            <td>
-                <h3>{{ record.name }}</h3>
-            </td>
-            <td>
-                <h3>{{ record.result }}</h3>
-            </td>
-            <td>
-                <img src="{{ record.graph }}">
-            </td>
-        </tr>
-    </div>
+{% for key, val in records.items() %}
+{% if val.modules %}
+<table class="table">
+    <h3>{{ key }}</h3>
+    <thead class="thread-inverse">
+    <tr>
+        {% for key, val in val.modules.items() %}
+        <th>{{ val.name }}</th>
     {% endfor %}
-</div>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        {% for modkey, modval in val.modules.items() %}
+        <th>
+            <div>
+                {% if modval.result == "pass" %}
+                <h4 style="color:green;">PASS</h4>
+                {% elif modval.result == "warn" %}
+                <h4 style="color:orange;">WARN</h4>
+                {% elif modval.result == "fail" %}
+                <h4 style="color:red;">FAIL</h4>
+                {% else %}
+                <h4>{{ modval.result }}</h4>
+                {% endif %}
+            </div>
+            <div>
+                {% if modval.graph_blob != "" %}
+                <img style='display:block; width:250px;height:250px;'
+                     src="data:image/png;base64,{{ modval.get_graph() }}"/>
+                {% endif %}
+            </div>
+
+            {% endfor %}
+    </tr>
+    </tbody>
+</table>
+{% endif %}
+
+{% endfor %}
 {% endblock %}

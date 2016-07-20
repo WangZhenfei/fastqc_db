@@ -17,6 +17,9 @@ class FastqcModule:
         self.raw_data = '\n'.join(lines[1:])
         self.graph_blob = graph_blob
 
+    def get_graph(self):
+        return self.graph_blob.decode('utf-8')
+
     def insertion_sql(self):
         return ["INSERT INTO {} (result, raw_data, graph) VALUES "
                 "(?, ?, ?);".format(self.table_name),

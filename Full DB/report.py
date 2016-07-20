@@ -11,7 +11,6 @@ from FastqcDatabase import FastqcDatabase
 app = Flask(__name__)
 Bootstrap(app)
 
-
 @app.route("/")
 def index():
     return render_template('main.html')
@@ -23,14 +22,6 @@ def all():
     return render_template('display.html',
                            title="All Results",
                            records=all_results)
-
-
-@app.route("/fail_results")
-def failed():
-    failed_records = app.fastqc_database.get_failed()
-    return render_template('display.html',
-                           title="Failed Results",
-                           records=failed_records)
 
 
 @app.route("/pass_results")
@@ -47,6 +38,38 @@ def warned():
     return render_template('display.html',
                            title="Warning Results",
                            records=warn_records)
+
+
+@app.route("/fail_results")
+def failed():
+    failed_records = app.fastqc_database.get_failed()
+    return render_template('display.html',
+                           title="Failed Results",
+                           records=failed_records)
+
+
+@app.route("/passed_modules")
+def modulepassed():
+    only_passed = app.fastqc_database.get_only(result='pass')
+    return render_template('display.html',
+                           title="Only Passing Modules",
+                           records=only_passed)
+
+
+@app.route("/warned_modules")
+def modulewarned():
+    only_warned = app.fastqc_database.get_only(result='warn')
+    return render_template('display.html',
+                           title="Only Warning Modules",
+                           records=only_warned)
+
+
+@app.route("/failed_modules")
+def modulefailed():
+    only_failed = app.fastqc_database.get_only(result='fail')
+    return render_template('display.html',
+                           title="Only Failing Modules",
+                           records=only_failed)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+from base64 import b64encode
 from collections import OrderedDict
 from os.path import basename
 from os.path import splitext
@@ -64,12 +65,12 @@ class FastqcData:
             for module in modules:
                 if module.table_name in cls.MODULE_GRAPH.keys():
                     try:
-                        module.graph_blob = zipfile.open(
+                        module.graph_blob = b64encode(zipfile.open(
                             "{}/Images/{}".format(base,
                                                   cls.MODULE_GRAPH[
                                                       module.table_name
                                                   ])
-                        ).read()
+                        ).read())
                     except KeyError:
                         print("No {} graph found".format(module.table_name))
 
@@ -112,14 +113,14 @@ class FastqcData:
     def __init__(self, fastqc_file="data_fastqc.zip", version="0.11.5"):
         self.fastqc_file = fastqc_file  # The Zip Archive containing results
         self.version = version
-        self.__modules = OrderedDict()
+        self.modules = OrderedDict()
 
     def module_names(self):
-        return [x.table_name for x in self.__modules.values()]
+        return [x.table_name for x in self.modules.values()]
 
     def get_module(self, name):
         try:
-            return self.__modules[name]
+            return self.modules[name]
         except KeyError as e:
             print("FastqcData object has no key {}".format(e), file=sys.stderr)
             raise e
@@ -127,7 +128,7 @@ class FastqcData:
     def set_module(self, name, value):
         try:
             assert (type(value) is FastqcModule)
-            self.__modules[name] = value
+            self.modules[name] = value
         except KeyError as e:
             print("FastqcData object has no key {}".format(e), file=sys.stderr)
             raise e
@@ -141,7 +142,7 @@ class FastqcData:
         :return:
         """
         for module in self.parse_modules(self.fastqc_file):
-            self.__modules[module.name] = module
+            self.modules[module.name] = module
 
     def insertion_sql(self):
         """
@@ -151,7 +152,7 @@ class FastqcData:
         :return: list<tuple(str, tuple(str,str))>: insertion sql for this file
         """
         sql_statements = []
-        for module in self.__modules.values():
+        for module in self.modules.values():
             sql_statements += [module.insertion_sql()]
 
         return sql_statements
@@ -164,7 +165,7 @@ class FastqcData:
         :return: list<str>: deletion sql for this file
         """
         sql_statements = []
-        for module in self.__modules:
+        for module in self.modules:
             sql_statements += [module.deletion_sql()]
 
         return sql_statements

@@ -9,8 +9,8 @@ from flask_bootstrap import Bootstrap
 from FastqcDatabase import FastqcDatabase
 
 
-def main(db_path="../test_fastqc_data/fastqc.db",
-         dir_path="../test_fastqc_data"):
+def main(dir_path="../test_fastqc_data",
+         db_path="../test_fastqc_data/fastqc.db"):
     """
     Assemble a full database of the fastqc_data, with each module occupying its
     own table.

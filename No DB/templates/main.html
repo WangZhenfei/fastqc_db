@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}FastQC DB{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>View Results</h1>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="container">
+            <a href="{{ url_for('all') }}" class="btn btn-lg btn-primary">ALL
+                RESULTS</a>
+            <a href="{{ url_for('passed') }}" class="btn btn-lg btn-success">ALL
+                PASSING RESULTS</a>
+            <a href="{{ url_for('warned') }}" class="btn btn-lg btn-warning">ALL
+                WARNING RESULTS</a>
+            <a href="{{ url_for('failed') }}" class="btn btn-lg btn-danger">ALL
+                FAILING RESULTS</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="container">
+            <a href="{{ url_for('modulepassed') }}"
+               class="btn btn-lg btn-success">ONLY PASSING MODULES</a>
+            <a href="{{ url_for('modulewarned') }}"
+               class="btn btn-lg btn-warning">ONLY WARNING MODULES</a>
+            <a href="{{ url_for('modulefailed') }}"
+               class="btn btn-lg btn-danger">ONLY FAILING MODULES</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

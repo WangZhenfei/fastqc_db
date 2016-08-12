@@ -1,5 +1,5 @@
 This is a small project to read fastqc_files into a database and display the
-results. Each current option makes a sqlite3 database of results.
+results. Two options makes a sqlite3 database of results, and one just displays the results without making a database (No DB).
 
 The full version creates a DB with the following schema:
 
@@ -51,7 +51,7 @@ The full database also generates a simple Flask application that reads all
 zipped files in a direcory and parses them into a table for display. As such,
 this application requires Flask to be installed (either on the system, or using
 a virtualenv). Once the application is running, people on your local network
-can see it by visiting <your IP address>:5000 on your favorite browser
+can see it by visiting [your IP address]:5000 on your favorite browser
 
 Usage:
 
@@ -63,3 +63,7 @@ into a database
 Usage:
 
     python3 Results\ DB/fastqc_results_db.py <input_root> <database_name.db>
+
+Usage:
+
+    python3 No\ DB/fastqc_report.py <input_root>

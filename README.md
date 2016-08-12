@@ -51,7 +51,7 @@ The full database also generates a simple Flask application that reads all
 zipped files in a direcory and parses them into a table for display. As such,
 this application requires Flask to be installed (either on the system, or using
 a virtualenv). Once the application is running, people on your local network
-can see it by visiting <your IP address>:5000 on your favorite browser
+can see it by visiting [your IP address]:5000 on your favorite browser
 
 Usage:
 

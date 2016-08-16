@@ -21,8 +21,8 @@ class FastqcDatabase():
                 if filename.endswith("_fastqc.zip"):
                     path = join(root, filename)
                     data = FastqcData(path)
-                    data.populate_from_file()
-                    self.fastqc_records[data.fastqc_file] = data
+                    data.parse_modules(path)
+                    self.fastqc_records[data.fastqc_zip] = data
 
     def get_all(self):
         return self.fastqc_records

@@ -29,5 +29,27 @@
                class="btn btn-lg btn-danger">ONLY FAILING MODULES</a>
         </div>
     </div>
+    <div class="row">
+        <div class="container">
+            <a href="{{ url_for('all_source') }}" class="btn btn-lg btn-primary">ALL RESULTS</a>
+            <a href="{{ url_for('passed_source') }}"
+               class="btn btn-lg btn-success">ALL PASSING REPORT</a>
+            <a href="{{ url_for('warned_source') }}"
+               class="btn btn-lg btn-warning">ALL WARNING REPORT</a>
+            <a href="{{ url_for('failed_source') }}"
+               class="btn btn-lg btn-danger">ALL FAILING REPORT</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="container">
+            <a href="{{ url_for('passed_module_source') }}"
+               class="btn btn-lg btn-success">PASSING MODULES REPORT</a>
+            <a href="{{ url_for('warned_module_source') }}"
+               class="btn btn-lg btn-warning">WARNING MODULES REPORT</a>
+            <a href="{{ url_for('failed_module_source') }}"
+               class="btn btn-lg btn-danger">FAILING MODULES REPORT</a>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

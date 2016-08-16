@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 from sys import argv
 
-from Flask import Flask
+from flask import Flask
 from flask import render_template
 from flask_bootstrap import Bootstrap
 
-from fastqc_db import FastqcDatabase
+from FastqcDatabase import FastqcDatabase
 
 app = Flask(__name__)
 Bootstrap(app)
+
+@app.route("/")
+def index():
+    return render_template('main.html', title='Fastqc DB')
 
 
 @app.route("/all_results")
@@ -68,6 +72,6 @@ def modulefailed():
 
 
 if __name__ == "__main__":
-    app.fastqc_database = FastqcDatabase(argv[1])
-    app.fastqc_database.load_from_dir(argv[1])
+    app.records = FastqcDatabase(argv[1])
+    app.records.load_from_dir(argv[1])
     app.run('0.0.0.0')

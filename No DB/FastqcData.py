@@ -21,13 +21,18 @@ class FastqcData:
         'per_tile_sequence_quality': 'per_tile_quality.png'
     }  # Dictionary of parsed module names and their graph names
 
-    def parse_modules(cls, fastqc_data_zip):
+    def __init__(self, fastqc_zip):
+        self.fastqc_zip = fastqc_zip
+
+    def parse_modules(cls, fastqc_data_zip=""):
         """
         Return a list of FastqcModule objects that have been populated with
         Module information from the passed lines of a read fastqc_data file
         :param fastqc_data_zip: str: The fastqc zip file
         :return: list<FastqcModule>
         """
+        if fastqc_data_zip == "":
+            fastqc_data_zip = self.fastqc_zip
 
         modules = []
 

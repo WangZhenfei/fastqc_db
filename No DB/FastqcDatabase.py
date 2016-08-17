@@ -21,7 +21,8 @@ class FastqcDatabase():
                 if filename.endswith("_fastqc.zip"):
                     path = join(root, filename)
                     data = FastqcData(path)
-                    data.parse_modules(path)
+                    for module in data.parse_modules(path):
+                        data.modules[module.table_name] = module
                     self.fastqc_records[data.fastqc_zip] = data
 
     def get_all(self):
@@ -37,41 +38,20 @@ class FastqcDatabase():
 
         return copy_dict
 
-    def get_passed(self):
-        passed = OrderedDict()
+    def get(self, result):
+        if result == 'all':
+            return self.get_all()
+
+        records = OrderedDict()
+
         for key, val in self.fastqc_records.items():
-            has_fail = False
+            has_result = False
             for module in val.modules.values():
-                if module.result == "fail":
-                    has_fail = True
+                if module.result == result:
+                    has_result = True
+                    break
 
-            if not has_fail:
-                passed[key] = val
+            if not has_result:
+                records[key] = val
 
-        return passed
-
-    def get_warned(self):
-        warn = OrderedDict()
-        for key, val in self.fastqc_records.items():
-            has_warn = False
-            for module in val.modules.values():
-                if module.result == "warn":
-                    has_warn = True
-
-            if has_warn:
-                warn[key] = val
-
-        return warn
-
-    def get_failed(self):
-        failed = OrderedDict()
-        for key, val in self.fastqc_records.items():
-            has_fail = False
-            for module in val.modules.values():
-                if module.result == "fail":
-                    has_fail = True
-
-            if has_fail:
-                failed[key] = val
-
-        return failed
+        return records

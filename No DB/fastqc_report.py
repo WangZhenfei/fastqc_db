@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 from sys import argv
-
+from io import StringIO
+from flask import send_file
 from flask import Flask
 from flask import render_template
+from flask import request
 from flask_bootstrap import Bootstrap
-
 from FastqcDatabase import FastqcDatabase
 
 app = Flask(__name__)
 Bootstrap(app)
+
 
 @app.route("/")
 def index():
@@ -25,7 +27,7 @@ def all():
 
 @app.route("/pass_results")
 def passed():
-    pass_records = app.records.get_passed()
+    pass_records = app.records.get('pass')
     return render_template('display.html',
                            title="Passed Results",
                            records=pass_records)
@@ -33,7 +35,7 @@ def passed():
 
 @app.route("/warn_results")
 def warned():
-    warn_records = app.records.get_warned()
+    warn_records = app.records.get('warn')
     return render_template('display.html',
                            title="Warning Results",
                            records=warn_records)
@@ -41,7 +43,7 @@ def warned():
 
 @app.route("/fail_results")
 def failed():
-    failed_records = app.records.get_failed()
+    failed_records = app.records.get('fail')
     return render_template('display.html',
                            title="Failed Results",
                            records=failed_records)
@@ -71,7 +73,11 @@ def modulefailed():
                            records=only_failed)
 
 
+@app.route("/download", methods=["GET", "POST"])
+def download():
+    pass
+
 if __name__ == "__main__":
     app.records = FastqcDatabase(argv[1])
     app.records.load_from_dir(argv[1])
-    app.run('0.0.0.0')
+    app.run('0.0.0.0', debug=True)

@@ -3,7 +3,7 @@ from base64 import b64encode
 from os.path import basename
 from os.path import splitext
 from zipfile import ZipFile
-
+from collections import OrderedDict
 from FastqcModule import FastqcModule
 
 
@@ -23,6 +23,7 @@ class FastqcData:
 
     def __init__(self, fastqc_zip):
         self.fastqc_zip = fastqc_zip
+        self.modules = OrderedDict()
 
     def parse_modules(cls, fastqc_data_zip=""):
         """

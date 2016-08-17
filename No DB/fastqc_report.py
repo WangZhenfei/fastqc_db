@@ -73,10 +73,6 @@ def modulefailed():
                            records=only_failed)
 
 
-@app.route("/download", methods=["GET", "POST"])
-def download():
-    pass
-
 if __name__ == "__main__":
     app.records = FastqcDatabase(argv[1])
     app.records.load_from_dir(argv[1])
